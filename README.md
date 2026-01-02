@@ -1,61 +1,97 @@
-# Air Quality Analysis in Indian Cities (Hourly Data)
+# Hourly AQI Prediction Using Deep Learning (MLP & LSTM)
 
 ## 📌 Project Overview
-This project analyzes **hourly air quality data of Indian cities** to study pollution trends, AQI behavior, and the impact of major pollutants. The analysis is performed using the **city_hour.csv** dataset from Kaggle, focusing on data cleaning, exploratory data analysis (EDA), and visualization.
+This project focuses on **predicting the next-hour Air Quality Index (AQI)** for an Indian city using **deep learning time-series models**.  
+The models are trained on **hourly pollutant data** derived from the *city_hour* dataset and use historical pollutant values to forecast future AQI.
+
+The project implements and compares **two neural network architectures**:
+- Multi-Layer Perceptron (MLP)
+- Stacked Long Short-Term Memory (LSTM)
 
 ## 📂 Dataset
 - **Dataset Name:** Air Quality Data in India  
 - **Source:** Kaggle  
-- **File Used:** `city_hour.csv`  
 - **Dataset Link:** https://www.kaggle.com/datasets/rohanrao/air-quality-data-in-india  
+- **File Used:** `city_hour.csv` (cleaned and filtered for city-level hourly data)
 
-The dataset contains hourly air quality measurements across multiple Indian cities, including AQI values and key pollutants.
+### Features Used (6 Total)
+- PM2.5  
+- PM10  
+- O₃  
+- CO  
+- NO₂  
+- AQI *(target variable)*
 
-## 🧪 Dataset Features
-- City
-- DateTime (hourly)
-- AQI (Air Quality Index)
-- Pollutants:
-  - PM2.5
-  - PM10
-  - NO₂
-  - SO₂
-  - CO
-  - O₃
+## 🎯 Problem Statement
+Given the **last 6 hours of pollutant concentrations and AQI**, predict the **AQI for the next hour**.
+
+This is framed as a **time-series regression problem**.
+
+## 🧠 Models Implemented
+
+### 1️⃣ Multi-Layer Perceptron (MLP)
+- Input: Flattened time window (6 hours × 6 features = 36 inputs)
+- Architecture:
+  - Dense(128) → Dense(64) → Dense(32) → Dense(16)
+  - ReLU activations
+- Output: Next-hour AQI
+- Loss Function: Mean Squared Error (MSE)
+- Optimizer: Adam
+- Regularization: Early Stopping
+
+### 2️⃣ Stacked LSTM
+- Input Shape: (6 timesteps, 6 features)
+- Architecture:
+  - LSTM(100, return_sequences=True)
+  - LSTM(50)
+  - Dropout layers
+- Output: Next-hour AQI
+- Loss Function: Mean Squared Error (MSE)
+- Optimizer: Adam
+- Regularization: Early Stopping
+
+## ⚙️ Data Preprocessing
+- City-level filtering (e.g., Delhi)
+- Linear interpolation for missing values
+- MinMax scaling applied to all features
+- Sliding window sequence creation (6-hour lookback)
+
+## 📊 Model Evaluation
+Models are evaluated on unseen test data using:
+- **Root Mean Squared Error (RMSE)**
+- **Mean Absolute Error (MAE)**
+
+Evaluation is performed after inverse-scaling predicted AQI values.
+
+## 🔮 Prediction Pipeline
+Separate prediction scripts are provided for both models:
+- Accept last 6 hours of pollutant + AQI data
+- Scale inputs using saved scalers
+- Predict next-hour AQI
+- Map AQI value to standard AQI categories:
+  - Good, Satisfactory, Moderate, Poor, Very Poor, Severe
+
+## 💾 Saved Artifacts
+- Trained model files (`.keras`)
+- Fitted scalers (`.pkl`)
+- Training history for loss visualization
 
 ## 🛠️ Tools & Technologies
-- Python  
-- Pandas, NumPy  
-- Matplotlib, Seaborn  
-- Jupyter Notebook / Google Colab  
-
-## 🔍 Analysis Performed
-- Data cleaning and missing value handling  
-- Exploratory Data Analysis (EDA)  
-- City-wise AQI comparison  
-- Hourly pollution trend analysis  
-- Pollutant-wise contribution analysis  
-- Data visualization for insights  
-
-## 📊 Key Insights
-- AQI levels vary significantly across cities  
-- Certain hours show consistent pollution peaks  
-- PM2.5 and PM10 are the dominant pollutants affecting AQI  
-- Metropolitan cities generally record higher AQI levels  
+- Python
+- Pandas, NumPy
+- Scikit-learn
+- TensorFlow / Keras
+- Matplotlib
+- Jupyter Notebook / Google Colab
 
 ## 🚀 How to Run
-1. Clone this repository  
-2. Open the `.ipynb` notebook in Jupyter Notebook or Google Colab  
-3. Install required Python libraries  
-4. Run all cells sequentially  
+1. Prepare cleaned city-level hourly data (`delhi_cleaned.csv`)
+2. Run the training script (MLP or LSTM)
+3. Saved models and scalers will be generated automatically
+4. Run the corresponding prediction script to forecast next-hour AQI
 
 ## 📌 Use Case
-- Environmental data analysis  
-- Public health insights  
-- Data analytics and visualization practice  
-- Academic and portfolio project  
-
-## 📁 Repository Structure
-├── Air_Quality_Analysis.ipynb
-
-├── README.md
+- Time-series forecasting
+- Environmental monitoring
+- Deep learning model comparison
+- Academic and portfolio demonstration project
